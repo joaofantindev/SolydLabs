@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% from "_cards.html" import course_row, lab_card with context %}
+{% from "_icons.html" import icon %}
+{% block title %}{{ trilha.nome }} — Trilha{% endblock %}
+{% block page_label %}Trilha · {{ trilha.nome }}{% endblock %}
+
+{% block content %}
+<nav class="crumbs">
+  <a href="{{ url_for('trilhas') }}">Trilhas</a>{{ icon('chevron-right', 13) }}<span>{{ trilha.nome }}</span>
+</nav>
+
+<header class="track-hero" style="--accent:{{ trilha.cor }}">
+  <div class="th-glow"></div>
+  <div class="th-main">
+    <span class="th-icon">{{ icon(trilha.icone, 34) }}</span>
+    <div class="th-copy">
+      <div class="th-tags">
+        <span class="pill">{{ trilha.nivel }}</span>
+        {% if trilha.cert %}<a class="pill cert" href="{{ url_for('certificacao_page', slug=trilha.cert) }}">{{ icon('award', 12) }} {{ CERTS[trilha.cert].sigla }}</a>{% endif %}
+        <span class="pill ghost">{{ icon('clock', 12) }} {{ trilha.horas }}h</span>
+      </div>
+      <h1>{{ trilha.nome }}</h1>
+      <p>{{ trilha.descricao }}</p>
+      <div class="th-actions">
+        <a class="btn btn-primary" href="{{ url_for('curso_page', slug=cursos[0].slug) }}">{{ icon('play', 15) }} Começar trilha</a>
+        {% if labs %}<a class="btn btn-ghost" href="{{ url_for('lab_page', slug=labs[0].slug) }}">{{ icon('flask', 15) }} Abrir primeiro lab</a>{% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="th-progress">
+    <div class="track-ring" data-track-ring="{{ trilha.slug }}" style="--ring:{{ trilha.cor }}">
+      <div><strong data-track-pct-lg="{{ trilha.slug }}">0%</strong><span>concluído</span></div>
+    </div>
+    <div class="th-p-meta">
+      <span>{{ cursos|length }} cursos</span>
+      <span>{{ labs|length }} labs</span>
+      <span>{{ trilha.horas }}h</span>
+    </div>
+  </div>
+</header>
+
+<div class="track-layout">
+  <section class="track-main">
+    <header class="section-head compact">
+      <div>
+        <span class="kicker">CURRÍCULO</span>
+        <h2>Jornada de <span class="grad">{{ cursos|length }} cursos</span></h2>
+      </div>
+      <span class="tiny-note">{{ icon('info', 13) }} marque os cursos concluídos</span>
+    </header>
+    <div class="course-list">
+      {% for c in cursos %}{{ course_row(c, loop.index0, trilha.slug) }}{% endfor %}
+    </div>
+  </section>
+
+  <aside class="track-side">
+    {% if trilha.cert %}
+    {% set c = CERTS[trilha.cert] %}
+    <a class="side-cert" href="{{ url_for('certificacao_page', slug=c.slug) }}" style="--accent:{{ c.cor }}">
+      <span class="sc-shield">{{ icon('award', 22) }}</span>
+      <div><small>CERTIFICAÇÃO DA TRILHA</small><strong>{{ c.sigla }}</strong><span>{{ c.nome }}</span></div>
+      {{ icon('arrow-up-right', 16) }}
+    </a>
+    {% endif %}
+
+    <div class="side-card">
+      <h3>{{ icon('flask', 16) }} Labs desta trilha</h3>
+      {% for l in labs %}
+      <a class="side-lab" href="{{ url_for('lab_page', slug=l.slug) }}">
+        <span class="sl-dot" style="--dot:{{ l.cor }}"></span>
+        <div><strong>{{ l.nome }}</strong><small>{{ l.categoria }} · {{ l.dificuldade }}</small></div>
+        {{ icon('chevron-right', 15) }}
+      </a>
+      {% endfor %}
+    </div>
+
+    <div class="side-card pad">
+      <h3>{{ icon('target', 16) }} Ao final você será capaz de</h3>
+      <ul class="side-list">
+        {% for c in cursos[:4] %}
+        <li>{{ icon('check', 13) }} {{ c.nome }}</li>
+        {% endfor %}
+        {% if cursos|length > 4 %}<li class="more">+ {{ cursos|length - 4 }} competências</li>{% endif %}
+      </ul>
+    </div>
+
+    <div class="side-tip">
+      <span>{{ icon('bolt', 16) }}</span>
+      <p><strong>Dica de estudo:</strong> abra o lab antes de terminar o curso. Aprender com o alvo na frente acelera tudo.</p>
+    </div>
+  </aside>
+</div>
+{% endblock %}

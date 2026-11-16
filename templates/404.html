@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}404 — SOLYD // LABS{% endblock %}
+{% block page_label %}404{% endblock %}
+{% block content %}
+<div class="error-page">
+  <span class="err-code">404</span>
+  <h1>Alvo não <span class="grad">encontrado</span>.</h1>
+  <p>Essa rota não existe ou o laboratório foi desligado. Volte para o dashboard e escolha outro alvo.</p>
+  <div class="th-actions center">
+    <a class="btn btn-primary" href="{{ url_for('index') }}">{{ icon('grid', 15) }} Voltar ao dashboard</a>
+    <a class="btn btn-ghost" href="{{ url_for('labs') }}">{{ icon('flask', 15) }} Ver laboratórios</a>
+  </div>
+</div>
+{% endblock %}

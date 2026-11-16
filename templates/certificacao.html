@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% from "_cards.html" import lab_card with context %}
+{% from "_icons.html" import icon %}
+{% block title %}{{ cert.sigla }} — {{ cert.nome }}{% endblock %}
+{% block page_label %}Certificação · {{ cert.sigla }}{% endblock %}
+
+{% block content %}
+<nav class="crumbs">
+  <a href="{{ url_for('certificacoes') }}">Certificações</a>{{ icon('chevron-right', 13) }}<span>{{ cert.sigla }}</span>
+</nav>
+
+<header class="cert-detail-hero" style="--accent:{{ cert.cor }}">
+  <div class="cdh-glow"></div>
+  <div class="cdh-badge">
+    <span class="cdh-icon">{{ icon(cert.icone, 40) }}</span>
+    <span class="cdh-sigla">{{ cert.sigla }}</span>
+    <span class="cdh-shine"></span>
+  </div>
+  <div class="cdh-copy">
+    <span class="kicker">CERTIFICAÇÃO PRÁTICA</span>
+    <h1>{{ cert.nome }}</h1>
+    <p>{{ cert.descricao }}</p>
+    <div class="cdh-meta">
+      <span>{{ icon('clock', 14) }} {{ cert.duracao }}</span>
+      <span>{{ icon('target', 14) }} {{ cert.nivel }}</span>
+      <span>{{ icon('flask', 14) }} {{ cert.labs|length }} labs</span>
+      <span>{{ icon('scroll', 14) }} exame + relatório</span>
+    </div>
+    <div class="th-actions">
+      {% if trilhas %}<a class="btn btn-primary" href="{{ url_for('trilha_page', slug=trilhas[0].slug) }}">{{ icon('play', 15) }} Iniciar trilha recomendada</a>{% endif %}
+      <a class="btn btn-ghost" href="#labs">{{ icon('flask', 15) }} Ver labs do exame</a>
+    </div>
+  </div>
+</header>
+
+<div class="cert-detail-grid">
+  <section class="cd-main">
+    <div class="panel">
+      <h2>{{ icon('layers', 17) }} Fases da certificação</h2>
+      <div class="phase-timeline">
+        {% for f in cert.fases %}
+        <div class="phase"><span>{{ '%02d' % loop.index }}</span><div><strong>{{ f }}</strong><small>{{ 'Etapa prática avaliada' if loop.index < 5 else 'Validação final' }}</small></div></div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>{{ icon('target', 17) }} Habilidades avaliadas</h2>
+      <div class="skill-cloud">
+        {% for s in cert.skills %}<span>{{ s }}</span>{% endfor %}
+      </div>
+      <h3 class="sub-h">Requisitos</h3>
+      <ul class="side-list">
+        {% for r in cert.requisitos %}<li>{{ icon('check', 13) }} {{ r }}</li>{% endfor %}
+      </ul>
+    </div>
+
+    <div class="panel" id="labs">
+      <h2>{{ icon('flask', 17) }} Laboratórios recomendados</h2>
+      <div class="mini-labs">
+        {% for l in labs_list %}
+        <a class="mini-lab" href="{{ url_for('lab_page', slug=l.slug) }}">
+          <span class="ml-icon" style="--accent:{{ l.cor }}">{{ icon(l.icone, 20) }}</span>
+          <div><strong>{{ l.nome }}</strong><small>{{ l.categoria }} · {{ l.dificuldade }} · {{ l.pontos }} XP</small></div>
+          <span class="dif {{ l.dificuldade|lower }}">{{ l.dificuldade }}</span>
+          {{ icon('chevron-right', 15) }}
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <aside class="cd-side">
+    <div class="side-card pad">
+      <h3>{{ icon('route', 16) }} Trilhas que preparam</h3>
+      {% for t in trilhas %}
+      <a class="side-lab" href="{{ url_for('trilha_page', slug=t.slug) }}">
+        <span class="sl-dot" style="--dot:{{ t.cor }}"></span>
+        <div><strong>{{ t.nome }}</strong><small>{{ t.cursos|length }} cursos · {{ t.horas }}h</small></div>
+        {{ icon('chevron-right', 15) }}
+      </a>
+      {% endfor %}
+    </div>
+
+    <div class="side-card pad">
+      <h3>{{ icon('scroll', 16) }} Formato do exame</h3>
+      <div class="kv"><span>Duração</span><strong>{{ cert.duracao }}</strong></div>
+      <div class="kv"><span>Modalidade</span><strong>100% prático</strong></div>
+      <div class="kv"><span>Entrega</span><strong>Relatório técnico</strong></div>
+      <div class="kv"><span>Validação</span><strong>Entrevista em vídeo</strong></div>
+      <div class="kv"><span>Kit</span><strong>Certificado + dogtag</strong></div>
+    </div>
+
+    <div class="side-tip">
+      <span>{{ icon('clock', 16) }}</span>
+      <p><strong>Prepare-se:</strong> reserve pelo menos 72h livres para o exame e mantenha suas anotações de enumeração organizadas.</p>
+    </div>
+
+    <a class="side-back" href="{{ url_for('certificacoes') }}">{{ icon('award', 15) }} Comparar certificações</a>
+  </aside>
+</div>
+{% endblock %}

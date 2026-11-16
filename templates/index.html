@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% from "_cards.html" import trilha_card, lab_card, cert_card with context %}
+{% from "_icons.html" import icon %}
+{% block title %}SOLYD // LABS — Aprenda hacking na prática{% endblock %}
+{% block page_label %}Dashboard{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-copy">
+    <div class="eyebrow"><span class="live-dot"></span> TEMPORADA 2026 · {{ total_labs }} LABS INTERATIVOS NO AR</div>
+    <h1>Não assista.<br><span class="grad">Hackeie de verdade.</span></h1>
+    <p class="hero-sub">Trilhas completas de segurança ofensiva, certificações e laboratórios que rodam direto no navegador. Terminal simulado, alvos reais de treino e flags para capturar.</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary btn-lg" href="{{ url_for('labs') }}">{{ icon('play', 17) }} Explorar laboratórios</a>
+      <a class="btn btn-ghost btn-lg" href="{{ url_for('trilhas') }}">{{ icon('route', 17) }} Ver trilhas</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hs"><strong>{{ CURSOS|length }}</strong><span>cursos</span></div>
+      <div class="hs"><strong>{{ total_horas }}h</strong><span>de conteúdo</span></div>
+      <div class="hs"><strong>{{ total_certs }}</strong><span>certificações</span></div>
+      <div class="hs"><strong>{{ total_labs }}</strong><span>labs práticos</span></div>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="hack-card">
+      <div class="hc-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="hc-title">{{ icon('terminal', 13) }} kali@solyd — zsh</span>
+        <span class="hc-status"><i></i> VM online</span>
+      </div>
+      <div class="hc-body">
+        <div><span class="c-mut">┌──(</span><span class="c-red">kali㉿solyd</span><span class="c-mut">)-[~]</span></div>
+        <div><span class="c-mut">└─$</span> <span class="c-cmd">nmap -sV 10.10.20.7</span></div>
+        <div class="c-mut">Starting Nmap 7.94 ...</div>
+        <div>PORT   STATE SERVICE  VERSION</div>
+        <div><span class="c-teal">80/tcp open  http</span>     nginx 1.18.0</div>
+        <div><span class="c-teal">3306/tcp open mysql</span>    MySQL 5.7</div>
+        <div class="gap"></div>
+        <div><span class="c-mut">└─$</span> <span class="c-cmd">curl -s "http://10.10.20.7/search?q=' UNION SELECT 1,name,value FROM secrets -- "</span></div>
+        <div class="c-amber">[+] 3 rows returned</div>
+        <div class="c-red">flag &nbsp;→&nbsp; SOLYD{un10n_b4s3d_dump}</div>
+        <div class="gap"></div>
+        <div><span class="c-mut">└─$</span> <span class="caret"></span></div>
+      </div>
+      <div class="hc-foot">
+        <a class="btn btn-sm btn-primary" href="{{ url_for('lab_page', slug='eletroninja') }}">{{ icon('power', 14) }} Iniciar aplicação</a>
+        <span class="hc-hint">{{ icon('lock', 12) }} isolado no seu navegador</span>
+      </div>
+    </div>
+    <span class="float-chip c1">{{ icon('database', 13) }} SQL Injection</span>
+    <span class="float-chip c2">{{ icon('code', 13) }} XSS</span>
+    <span class="float-chip c3">{{ icon('book', 13) }} LFI</span>
+    <span class="float-chip c4">{{ icon('target', 13) }} IDOR</span>
+    <span class="float-orbit o1"></span>
+    <span class="float-orbit o2"></span>
+  </div>
+</section>
+
+<div class="resume-bar" id="resumeBar" hidden>
+  <span class="rb-icon">{{ icon('zap', 18) }}</span>
+  <div class="rb-body">
+    <strong>Continue de onde parou</strong>
+    <span id="resumeText">Seu próximo laboratório está esperando.</span>
+  </div>
+  <a class="btn btn-sm btn-primary" id="resumeLink" href="{{ url_for('labs') }}">Continuar {{ icon('arrow-right', 14) }}</a>
+</div>
+
+<section class="section">
+  <header class="section-head">
+    <div>
+      <span class="kicker">PRATIQUE AGORA</span>
+      <h2>Laboratórios <span class="grad">em destaque</span></h2>
+      <p>Alvos vulneráveis de propósito. Inicie a aplicação, ataque no terminal e capture as flags.</p>
+    </div>
+    <a class="link-more" href="{{ url_for('labs') }}">Ver todos os labs {{ icon('arrow-right', 15) }}</a>
+  </header>
+  <div class="lab-grid">
+    {% for slug in LAB_ORDER[:4] %}{{ lab_card(LABS[slug]) }}{% endfor %}
+  </div>
+</section>
+
+<section class="vm-banner">
+  <div class="vm-visual">
+    <div class="vm-screen">
+      <div class="vms-bar"><i></i><i></i><i></i><span>solyd-lab</span></div>
+      <div class="vms-body">
+        <div class="vms-row"><span class="c-mut">$</span> ./start-lab --target eletroninja</div>
+        <div class="vms-row c-teal">[ OK ] container iniciado</div>
+        <div class="vms-row c-teal">[ OK ] rede isolada 10.10.20.0/24</div>
+        <div class="vms-row c-amber">[ * ] alvo pronto em 10.10.20.7</div>
+        <div class="vms-row"><span class="c-mut">$</span> <span class="caret"></span></div>
+      </div>
+    </div>
+    <span class="vm-orbit"></span>
+  </div>
+  <div class="vm-copy">
+    <span class="kicker">VM NO NAVEGADOR</span>
+    <h2>Um botão. <span class="grad">Zero configuração.</span></h2>
+    <p>Nada de VPN, Kali ou Docker. Cada laboratório tem seu próprio terminal simulado, aplicação-alvo isolada e botão de iniciar/parar. O ambiente nasce zerado a cada sessão.</p>
+    <ul class="check-list">
+      <li>{{ icon('check', 15) }} Terminal com comandos reais de pentest</li>
+      <li>{{ icon('check', 15) }} Aplicações web vulneráveis de verdade</li>
+      <li>{{ icon('check', 15) }} Flags, XP, ranking e dicas progressivas</li>
+      <li>{{ icon('check', 15) }} Reset com um clique, sem sujar sua máquina</li>
+    </ul>
+    <a class="btn btn-primary" href="{{ url_for('labs') }}">{{ icon('power', 15) }} Iniciar um laboratório</a>
+  </div>
+</section>
+
+<section class="section">
+  <header class="section-head">
+    <div>
+      <span class="kicker">FORMAÇÕES</span>
+      <h2>Trilhas para ir do zero ao <span class="grad">red team</span></h2>
+      <p>Uma jornada guiada por área. Marque cursos como concluídos e acompanhe seu avanço.</p>
+    </div>
+    <a class="link-more" href="{{ url_for('trilhas') }}">Todas as trilhas {{ icon('arrow-right', 15) }}</a>
+  </header>
+  <div class="trilha-grid">
+    {% for t in destaques %}{{ trilha_card(t) }}{% endfor %}
+  </div>
+</section>
+
+<section class="section">
+  <header class="section-head">
+    <div>
+      <span class="kicker">CERTIFICAÇÕES</span>
+      <h2>Prove o que você <span class="grad">sabe fazer</span></h2>
+      <p>Cinco certificações práticas, cada uma com trilha, labs e exame no estilo mercado.</p>
+    </div>
+    <a class="link-more" href="{{ url_for('certificacoes') }}">Ver todas {{ icon('arrow-right', 15) }}</a>
+  </header>
+  <div class="cert-grid">
+    {% for c in CERTS.values() %}{{ cert_card(c) }}{% endfor %}
+  </div>
+</section>
+
+<section class="cta-panel">
+  <div class="cta-noise"></div>
+  <span class="cta-kicker">{{ icon('skull', 15) }} O PRÓXIMO SHELL É SEU</span>
+  <h2>Pronto para a sua<br>primeira <span class="grad">flag</span>?</h2>
+  <p>O EletroNinja está online esperando por um <code>' OR 1=1 --</code>. Sem instalar nada.</p>
+  <div class="cta-actions">
+    <a class="btn btn-primary btn-lg" href="{{ url_for('lab_page', slug='eletroninja') }}">{{ icon('play', 17) }} Começar pelo EletroNinja</a>
+    <a class="btn btn-ghost btn-lg" href="{{ url_for('trilha_page', slug='absoluto-zero') }}">Começar do absoluto zero</a>
+  </div>
+  <div class="cta-meta">{{ icon('clock', 13) }} leva ~30 min · {{ icon('flag', 13) }} 2 flags · {{ icon('bolt', 13) }} 300 XP</div>
+</section>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% from "_cards.html" import cert_card with context %}
+{% from "_icons.html" import icon %}
+{% block title %}Certificações — SOLYD // LABS{% endblock %}
+{% block page_label %}Certificações{% endblock %}
+
+{% block content %}
+<header class="page-hero certs-hero">
+  <div class="ph-glow" style="--accent:#ff3557"></div>
+  <span class="kicker">PROVE SUA EXPERTISE</span>
+  <h1>Certificações <span class="grad">práticas</span>.<br>Nada de múltipla escolha.</h1>
+  <p>Cinco exames no formato mercado: cenário real, tempo controlado, exploração de verdade e relatório profissional. Cada certificação tem uma trilha e laboratórios recomendados.</p>
+  <div class="ph-stats">
+    {% for c in CERTS.values() %}<span style="color:{{ c.cor }}">{{ icon(c.icone, 15) }} {{ c.sigla }}</span>{% endfor %}
+  </div>
+</header>
+
+<div class="cert-grid all">
+  {% for c in CERTS.values() %}{{ cert_card(c) }}{% endfor %}
+</div>
+
+<section class="cert-compare">
+  <span class="kicker">COMPARATIVO</span>
+  <h2>Qual é a sua <span class="grad">próxima conquista</span>?</h2>
+  <div class="table-wrap">
+    <table class="compare-table">
+      <thead><tr><th>Certificação</th><th>Foco</th><th>Nível</th><th>Exame</th><th>Labs</th></tr></thead>
+      <tbody>
+        {% for c in CERTS.values() %}
+        <tr>
+          <td><a class="ct-sigla" style="--accent:{{ c.cor }}" href="{{ url_for('certificacao_page', slug=c.slug) }}">{{ c.sigla }}</a><span class="ct-name">{{ c.nome }}</span></td>
+          <td>{{ c.skills[:2]|join(' · ') }}</td>
+          <td><span class="pill">{{ c.nivel }}</span></td>
+          <td>{{ c.duracao }}</td>
+          <td>{{ c.labs|length }} labs</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="cert-steps">
+  <span class="kicker">COMO FUNCIONA</span>
+  <h2>Do estudo ao <span class="grad">certificado</span></h2>
+  <div class="steps-grid">
+    <div class="step"><span class="step-num">01</span><span class="step-ico">{{ icon('book', 20) }}</span><h3>Estude a trilha</h3><p>Aulas objetivas, laboratórios e desafios na ordem certa.</p></div>
+    <div class="step"><span class="step-num">02</span><span class="step-ico">{{ icon('flask', 20) }}</span><h3>Pratique nos labs</h3><p>Capture flags, escreva writeups e domine as ferramentas.</p></div>
+    <div class="step"><span class="step-num">03</span><span class="step-ico">{{ icon('target', 20) }}</span><h3>Execute o exame</h3><p>Cenário real, escopo definido e tempo controlado.</p></div>
+    <div class="step"><span class="step-num">04</span><span class="step-ico">{{ icon('award', 20) }}</span><h3>Entregue o relatório</h3><p>Sumário executivo, evidências, severidade e remediação.</p></div>
+  </div>
+</section>
+
+<section class="cta-panel slim">
+  <span class="cta-kicker">{{ icon('award', 15) }} ESCOLHA SEU CAMINHO</span>
+  <h2>Qual vai ser a sua <span class="grad">primeira sigla</span>?</h2>
+  <p>Recomendamos começar pela SYCP. Ela cobre web e infraestrutura e é a base para todas as outras.</p>
+  <div class="cta-actions">
+    <a class="btn btn-primary btn-lg" href="{{ url_for('certificacao_page', slug='sycp') }}">{{ icon('target', 17) }} Conhecer a SYCP</a>
+    <a class="btn btn-ghost btn-lg" href="{{ url_for('trilha_page', slug='absoluto-zero') }}">Começar do zero</a>
+  </div>
+</section>
+{% endblock %}

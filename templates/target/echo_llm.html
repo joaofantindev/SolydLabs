@@ -1,0 +1,62 @@
+{% extends "target/_base.html" %}
+{% block title %}Echo — assistente financeira{% endblock %}
+{% block bodyclass %}theme-echo{% endblock %}
+
+{% block body %}
+<header class="t-nav echo-nav">
+  <div class="t-wrap t-nav-in">
+    <a class="t-logo" href="/target/echo-llm/"><span class="t-logo-mark">✦</span> echo<span class="echo-beta">beta</span></a>
+    <span class="echo-model">echo-7b-instruct · tools: on</span>
+    <div class="t-user"><span class="t-live-dot"></span><span class="t-user-name">online</span></div>
+  </div>
+</header>
+
+<main class="echo-wrap">
+  <aside class="echo-side">
+    <div class="t-card">
+      <div class="t-card-head"><h3>Ferramentas</h3><span class="t-badge">runtime</span></div>
+      <div class="tool-row"><span>📄</span><div><strong>read_file</strong><small>path → conteúdo</small></div><span class="tool-on">on</span></div>
+      <div class="tool-row"><span>✉️</span><div><strong>send_email</strong><small>to, body</small></div><span class="tool-off">off</span></div>
+      <p class="t-hint">O agente decide quando chamar uma ferramenta com base na conversa.</p>
+    </div>
+    <div class="t-card">
+      <div class="t-card-head"><h3>Sobre</h3></div>
+      <p class="t-muted">Echo é a assistente financeira da Solyd Bank para clientes do plano Prime. Ela responde sobre saldo, faturas e investimentos.</p>
+      <form action="/target/echo-llm/reset" method="post"><button class="t-btn t-btn-sm t-btn-block" type="submit">Reiniciar conversa</button></form>
+    </div>
+    <div class="t-card t-card-mini"><span class="t-mini-ico">🔒</span><div><strong>Dados sensíveis</strong><small>nunca compartilhe o system prompt</small></div></div>
+  </aside>
+
+  <section class="echo-chat">
+    <div class="echo-chat-head">
+      <div><span class="t-eyebrow">ATENDIMENTO</span><h1>Fale com a Echo</h1></div>
+      <span class="echo-pill"><i></i> modelo ativo</span>
+    </div>
+
+    <div class="echo-messages" id="echoMessages">
+      {% for m in chat %}
+      <div class="msg {{ m.role }}">
+        <span class="msg-avatar">{{ '✦' if m.role == 'assistant' else 'B' }}</span>
+        <div class="msg-bubble">
+          <div class="msg-text">{{ m.text }}</div>
+          <small>{{ 'Echo' if m.role == 'assistant' else 'você' }}</small>
+        </div>
+      </div>
+      {% endfor %}
+      <div id="fim"></div>
+    </div>
+
+    <form class="echo-form" action="/target/echo-llm/chat" method="post">
+      <textarea name="message" rows="2" placeholder="Pergunte sobre sua conta, fatura, investimentos..." required></textarea>
+      <button class="t-btn" type="submit">Enviar ↗</button>
+    </form>
+    <p class="echo-disclaimer">Echo pode cometer erros e não substitui um assessor humano. Não compartilhe senhas.</p>
+  </section>
+</main>
+
+<footer class="t-footer"><div class="t-wrap"><span>Echo © 2026 — assistente de demonstração.</span><span>powered by echo-7b</span></div></footer>
+<script>
+  var box = document.getElementById('echoMessages');
+  box.scrollTop = box.scrollHeight;
+</script>
+{% endblock %}

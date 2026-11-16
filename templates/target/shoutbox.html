@@ -1,0 +1,76 @@
+{% extends "target/_base.html" %}
+{% block title %}ShoutBox — o mural da equipe{% endblock %}
+{% block bodyclass %}theme-shout{% endblock %}
+
+{% block body %}
+<header class="t-nav">
+  <div class="t-wrap t-nav-in">
+    <a class="t-logo" href="/target/shoutbox/"><span class="t-logo-mark">✳</span> Shout<span>Box</span></a>
+    <nav class="t-menu"><a href="/target/shoutbox/">Mural</a><a href="/target/shoutbox/#postar">Postar</a></nav>
+    <div class="t-user">
+      <span class="t-live-dot"></span><span class="t-user-name">admin-bot <small>revisando</small></span>
+    </div>
+  </div>
+</header>
+
+<main class="t-wrap shout-wrap">
+  <div class="shout-head">
+    <span class="t-eyebrow">MURAL INTERNO · STARTUP HORIZONTE</span>
+    <h1>Manda o <em>shout</em>.</h1>
+    <p>O mural onde a equipe combina deploys, cafés e dúvidas existenciais. O admin revisa tudo em segundos. 👀</p>
+  </div>
+
+  {% if captured %}
+  <div class="t-banner t-banner-ok shout-capture" id="captura">
+    <div>
+      <strong>🍪 Cookie do administrador capturado!</strong>
+      <p>O bot visitou seu payload. Use este cookie para abrir o painel:</p>
+      <code class="t-cookie">{{ captured }}</code>
+      <p class="t-flag">FLAG: SOLYD{xss_c00k13_st0l3n}</p>
+    </div>
+    <a class="t-btn" href="/target/shoutbox/admin?cookie={{ captured|urlencode }}">Abrir painel admin →</a>
+  </div>
+  {% endif %}
+
+  <div class="shout-grid">
+    <section class="shout-feed" id="mural">
+      <div class="t-section-head"><h2>Recados recentes</h2><span>{{ posts|length }} posts</span></div>
+      {% for p in posts %}
+      <article class="shout-post {{ 'danger' if '<script' in p.message|lower }}">
+        <span class="sp-avatar">{{ p.author[:1]|upper }}</span>
+        <div class="sp-body">
+          <div class="sp-top"><strong>{{ p.author }}</strong><small>{{ p.time }}</small></div>
+          <div class="sp-msg">{{ p.message|safe }}</div>
+        </div>
+      </article>
+      {% endfor %}
+    </section>
+
+    <aside class="shout-side">
+      <div class="t-card" id="postar">
+        <div class="t-card-head"><h3>Novo recado</h3><span class="t-badge">público</span></div>
+        <form class="t-form" action="/target/shoutbox/post" method="post">
+          <label>Seu nome<input name="author" maxlength="24" placeholder="anon" value="bruno"></label>
+          <label>Mensagem<textarea name="message" rows="4" maxlength="2000" placeholder="Escreva algo para a equipe..."></textarea></label>
+          <button class="t-btn t-btn-block" type="submit">Publicar recado</button>
+        </form>
+        <p class="t-hint">Mensagens são renderizadas como HTML — por design (ou por descuido).</p>
+      </div>
+
+      <div class="t-card t-card-mini">
+        <span class="t-mini-ico">🤖</span>
+        <div><strong>admin-bot</strong><small>visita cada novo post · cookie de admin</small></div>
+      </div>
+
+      {% if bot_log %}
+      <div class="t-card t-log">
+        <div class="t-card-head"><h3>Atividade do bot</h3><span class="t-badge">log</span></div>
+        {% for entry in bot_log %}<div class="log-line"><span>›</span> {{ entry }}</div>{% endfor %}
+      </div>
+      {% endif %}
+    </aside>
+  </div>
+</main>
+
+<footer class="t-footer"><div class="t-wrap"><span>ShoutBox © 2026 — aplicação de demonstração.</span><span>v2.1.0</span></div></footer>
+{% endblock %}

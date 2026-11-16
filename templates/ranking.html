@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Ranking & CTF — SOLYD // LABS{% endblock %}
+{% block page_label %}Ranking & CTF{% endblock %}
+
+{% block content %}
+<header class="page-hero rank-hero">
+  <div class="ph-glow" style="--accent:#a78bfa"></div>
+  <span class="kicker">HALL DA FAMA</span>
+  <h1>O ranking é <span class="grad">consequência</span>.<br>A flag é o objetivo.</h1>
+  <p>Cada laboratório concluído rende XP. Suba de nível, compare seu progresso e prepare-se para o próximo CTF.</p>
+</header>
+
+<div class="rank-layout">
+  <section class="rank-main">
+    <div class="you-card">
+      <div class="you-avatar">H4<i></i></div>
+      <div class="you-info">
+        <span class="you-kicker">SUA POSIÇÃO</span>
+        <h2 id="youName">Operador local</h2>
+        <span class="you-level" id="youLevel">Script Kiddie</span>
+      </div>
+      <div class="you-stats">
+        <div><strong id="youPos">#—</strong><span>posição</span></div>
+        <div><strong id="youXp">0</strong><span>XP</span></div>
+        <div><strong id="youFlags">0</strong><span>flags</span></div>
+      </div>
+      <div class="you-progress">
+        <div class="yp-top"><span id="youNextLabel">Próximo nível</span><span id="youNextXp">0 / 500</span></div>
+        <div class="bar"><span id="youBar" style="width:0%"></span></div>
+      </div>
+    </div>
+
+    <div class="panel leaderboard">
+      <div class="lb-head">
+        <h2>{{ icon('trophy', 17) }} Leaderboard global</h2>
+        <span class="pill ghost">{{ icon('users', 12) }} temporada 2026</span>
+      </div>
+      <div class="lb-rows">
+        {% for p in players %}
+        <div class="lb-row">
+          <span class="lb-pos {{ 'top' if p.pos <= 3 }}">{{ '%02d' % p.pos }}</span>
+          <span class="lb-avatar av{{ loop.index }}">{{ p.nome[:2]|upper }}</span>
+          <div class="lb-name"><strong>{{ p.nome }}</strong><small>{{ p.pais }}{% if p.badge %} · {{ p.badge }}{% endif %}</small></div>
+          <span class="lb-flags">{{ icon('flag', 12) }} {{ p.flags }}</span>
+          <span class="lb-xp">{{ p.xp }} <small>XP</small></span>
+        </div>
+        {% endfor %}
+        <div class="lb-row you" id="yourRow">
+          <span class="lb-pos" id="yourRowPos">#—</span>
+          <span class="lb-avatar av-you">H4</span>
+          <div class="lb-name"><strong>você</strong><small>BR · operador local</small></div>
+          <span class="lb-flags" id="yourRowFlags">{{ icon('flag', 12) }} <span id="yourRowFlagsVal">0</span></span>
+          <span class="lb-xp" id="yourRowXp">0 <small>XP</small></span>
+        </div>
+      </div>
+      <p class="lb-note">{{ icon('info', 13) }} Ranking local simulado. Seu XP fica salvo apenas neste navegador.</p>
+    </div>
+  </section>
+
+  <aside class="rank-side">
+    <div class="ctf-card">
+      <div class="ctf-glow"></div>
+      <span class="ctf-kicker">{{ icon('trophy', 14) }} SOLYD CTF · 10ª EDIÇÃO</span>
+      <h3>R$ 15.000 no Pix</h3>
+      <p>Dois CTFs por ano, dezenas de servidores e desafios reais. O próximo começa em:</p>
+      <div class="countdown" data-countdown>
+        <div><strong data-cd="d">14</strong><span>dias</span></div>
+        <div><strong data-cd="h">08</strong><span>horas</span></div>
+        <div><strong data-cd="m">42</strong><span>min</span></div>
+        <div><strong data-cd="s">07</strong><span>seg</span></div>
+      </div>
+      <a class="btn btn-primary full" href="{{ url_for('labs') }}">{{ icon('bolt', 15) }} Treinar para o CTF</a>
+      <div class="ctf-foot">{{ icon('users', 12) }} 1.284 hackers inscritos</div>
+    </div>
+
+    <div class="side-card pad">
+      <h3>{{ icon('star', 16) }} Hall da fama</h3>
+      <div class="hall">
+        <div><span class="hall-av">M</span><strong>Matheus C.</strong><small>9ª edição · 2026/1</small></div>
+        <div><span class="hall-av">O</span><strong>Otávio C.</strong><small>8ª edição · 2025/2</small></div>
+        <div><span class="hall-av">K</span><strong>Kaique C.</strong><small>7ª edição · 2025/1</small></div>
+      </div>
+    </div>
+
+    <div class="side-card pad">
+      <h3>{{ icon('bolt', 16) }} Como ganhar XP</h3>
+      <div class="xp-rule"><span>Flag fácil</span><strong>+100 XP</strong></div>
+      <div class="xp-rule"><span>Flag média</span><strong>+150 XP</strong></div>
+      <div class="xp-rule"><span>Flag difícil</span><strong>+250 XP</strong></div>
+      <div class="xp-rule"><span>Curso concluído</span><strong>+40 XP</strong></div>
+    </div>
+  </aside>
+</div>
+{% endblock %}

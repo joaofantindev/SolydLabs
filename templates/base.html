@@ -1,0 +1,173 @@
+{% from "_icons.html" import icon %}
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}SOLYD // LABS{% endblock %}</title>
+  <meta name="description" content="Plataforma local de treinamento em segurança ofensiva: trilhas, certificações e laboratórios interativos.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230d0708'/%3E%3Cpath d='M16 5l9 4v7c0 5.4-3.7 9-9 11-5.3-2-9-5.6-9-11V9l9-4z' fill='none' stroke='%23ff3557' stroke-width='2'/%3E%3Cpath d='M12 14l4 4 4-4' fill='none' stroke='%23ff3557' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body data-endpoint="{{ request.endpoint }}">
+  <div class="ambient" aria-hidden="true">
+    <div class="ambient-glow g1"></div>
+    <div class="ambient-glow g2"></div>
+    <div class="ambient-grid"></div>
+  </div>
+
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="{{ url_for('index') }}">
+        <span class="brand-mark">{{ icon('skull', 24) }}</span>
+        <span class="brand-text">
+          <strong>SOLYD<span class="brand-slash">//</span>LABS</strong>
+          <small>offensive playground</small>
+        </span>
+      </a>
+
+      <div class="nav-wrap">
+        <p class="nav-label">Plataforma</p>
+        <nav class="nav">
+          {% set ep = request.endpoint or '' %}
+          <a class="nav-item {{ 'active' if ep == 'index' }}" href="{{ url_for('index') }}">
+            {{ icon('grid') }}<span>Dashboard</span>
+          </a>
+          <a class="nav-item {{ 'active' if ep in ['trilhas','trilha_page','curso_page'] }}" href="{{ url_for('trilhas') }}">
+            {{ icon('route') }}<span>Trilhas</span><em>{{ TRILHAS|length }}</em>
+          </a>
+          <a class="nav-item {{ 'active' if ep in ['labs','lab_page'] }}" href="{{ url_for('labs') }}">
+            {{ icon('flask') }}<span>Laboratórios</span><em class="accent">{{ LABS|length }}</em>
+          </a>
+          <a class="nav-item {{ 'active' if ep in ['certificacoes','certificacao_page'] }}" href="{{ url_for('certificacoes') }}">
+            {{ icon('award') }}<span>Certificações</span>
+          </a>
+          <a class="nav-item {{ 'active' if ep == 'ranking' }}" href="{{ url_for('ranking') }}">
+            {{ icon('trophy') }}<span>Ranking & CTF</span>
+          </a>
+        </nav>
+
+        <p class="nav-label mt">Laboratórios rápidos</p>
+        <nav class="nav nav-mini">
+          {% for slug in ['eletroninja','shoutbox','papiro'] %}
+          {% set l = LABS[slug] %}
+          <a class="nav-item mini" href="{{ url_for('lab_page', slug=slug) }}">
+            <span class="dot" style="--dot:{{ l.cor }}"></span><span>{{ l.nome }}</span>
+            <em class="dif {{ l.dificuldade|lower }}">{{ l.dificuldade }}</em>
+          </a>
+          {% endfor %}
+        </nav>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sc-top">
+          <div class="mini-ring" id="miniRing" style="--p:0; --ring:#ff3557"><span id="miniRingVal">0%</span></div>
+          <div>
+            <small class="sc-label">SEU PROGRESSO</small>
+            <strong id="sidebarLevel">Script Kiddie</strong>
+          </div>
+        </div>
+        <div class="sc-bar"><span id="sidebarBar" style="width:0%"></span></div>
+        <div class="sc-meta"><span id="sidebarXp">0 XP</span><span id="sidebarFlags">0 flags</span></div>
+        <div class="sc-live"><i></i> ambiente local seguro</div>
+      </div>
+
+      <div class="sidebar-foot">
+        <span>{{ icon('shield', 14) }} apenas para treinamento</span>
+        <span class="ver">v1.0</span>
+      </div>
+    </aside>
+
+    <div class="shell">
+      <header class="topbar">
+        <button class="icon-btn menu-btn" id="menuBtn" aria-label="Abrir menu">{{ icon('menu') }}</button>
+        <div class="page-id">
+          <span class="crumb">{{ icon('terminal', 14) }} solyd<span>/</span>labs</span>
+          <strong>{% block page_label %}Dashboard{% endblock %}</strong>
+        </div>
+        <div class="top-actions">
+          <button class="search-trigger" id="searchTrigger" aria-label="Buscar">
+            {{ icon('search', 16) }}<span>Buscar trilhas, labs...</span><kbd>Ctrl</kbd><kbd>K</kbd>
+          </button>
+          <div class="xp-pill" title="Experiência acumulada">
+            {{ icon('bolt', 15) }}<span id="xpValue">0</span><small>XP</small>
+          </div>
+          <a class="rank-chip" id="rankChip" href="{{ url_for('ranking') }}" title="Seu nível">
+            <span class="rank-dot"></span><span id="rankName">Script Kiddie</span>
+          </a>
+          <div class="avatar" title="Operador local">
+            <span>H4</span><i></i>
+          </div>
+        </div>
+      </header>
+
+      <main class="main">
+        {% block content %}{% endblock %}
+      </main>
+
+      <footer class="footer">
+        <div>
+          <span class="f-brand">{{ icon('skull', 16) }} SOLYD <b>//</b> LABS</span>
+          <span class="f-note">Projeto educacional independente inspirado no catálogo público da Solyd. Não afiliado à Solyd Offensive Security.</span>
+        </div>
+        <div class="f-right">
+          <span class="f-badge">{{ icon('lock', 13) }} 127.0.0.1</span>
+          <span>Use somente em ambientes autorizados.</span>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="scrim" id="scrim"></div>
+
+  <!-- Command palette -->
+  <div class="palette" id="palette" aria-hidden="true" role="dialog" aria-label="Busca global">
+    <div class="palette-box">
+      <div class="palette-input">
+        {{ icon('search', 19) }}
+        <input id="paletteInput" type="text" placeholder="Buscar trilha, curso, lab ou certificação..." autocomplete="off">
+        <kbd>ESC</kbd>
+      </div>
+      <div class="palette-results" id="paletteResults"></div>
+      <div class="palette-foot"><span><kbd>↑</kbd><kbd>↓</kbd> navegar</span><span><kbd>↵</kbd> abrir</span><span>tudo offline</span></div>
+    </div>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <script>
+    window.SOLYD = {
+      index: [
+        {t:'Dashboard', s:'Visão geral', u:'{{ url_for('index') }}', k:'page'},
+        {t:'Trilhas', s:'Todas as formações', u:'{{ url_for('trilhas') }}', k:'page'},
+        {t:'Laboratórios', s:'Todos os labs', u:'{{ url_for('labs') }}', k:'page'},
+        {t:'Certificações', s:'SYCP, SYWP, SYH2, SYAP, SYES', u:'{{ url_for('certificacoes') }}', k:'page'},
+        {t:'Ranking & CTF', s:'Leaderboard', u:'{{ url_for('ranking') }}', k:'page'},
+        {% for t in TRILHAS %}{t:{{ t.nome|tojson }}, s:'Trilha · {{ t.nivel }}', u:'{{ url_for('trilha_page', slug=t.slug) }}', k:'trilha'},
+        {% endfor %}
+        {% for c in CURSOS.values() %}{t:{{ c.nome|tojson }}, s:'Curso · {{ c.nivel }}', u:'{{ url_for('curso_page', slug=c.slug) }}', k:'curso'},
+        {% endfor %}
+        {% for l in LABS.values() %}{t:{{ l.nome|tojson }}, s:'Lab · {{ l.categoria }}', u:'{{ url_for('lab_page', slug=l.slug) }}', k:'lab'},
+        {% endfor %}
+        {% for c in CERTS.values() %}{t:{{ c.sigla|tojson }}, s:'Certificação · {{ c.nome }}', u:'{{ url_for('certificacao_page', slug=c.slug) }}', k:'cert'}
+        {% endfor %}
+      ],
+      labs: {
+        {% for slug, l in LABS.items() %}{{ slug|tojson }}: {t:{{ l.nome|tojson }}, p:{{ l.pontos }}, n:{{ l.tarefas|length }}}{% if not loop.last %},{% endif %}{% endfor %}
+      },
+      levels: [
+        {% for xp, nome in NIVEIS %}[{{ xp }},{{ nome|tojson }}]{% if not loop.last %},{% endif %}{% endfor %}
+      ],
+      tracks: {
+        {% for t in TRILHAS %}{{ t.slug|tojson }}: {{ t.cursos|tojson }}{% if not loop.last %},{% endif %}{% endfor %}
+      }
+    };
+  </script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

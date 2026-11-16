@@ -1,0 +1,60 @@
+{% extends "target/_base.html" %}
+{% block title %}Grupo Meridiano — Network Monitor{% endblock %}
+{% block bodyclass %}theme-meridiano{% endblock %}
+
+{% block body %}
+<header class="t-nav meridiano-nav">
+  <div class="t-wrap t-nav-in">
+    <a class="t-logo" href="/target/meridiano/"><span class="t-logo-mark">◆</span> GRUPO <b>MERIDIANO</b></a>
+    <nav class="t-menu"><a href="/target/meridiano/">Monitor</a><a href="/target/meridiano/#status">Status</a><a href="/target/meridiano/#sobre">Sobre</a></nav>
+    <div class="t-user"><span class="t-badge">intranet</span><span class="t-user-name">operador <small>NOC</small></span></div>
+  </div>
+</header>
+
+<main class="t-wrap meri-wrap">
+  <section class="meri-hero">
+    <div>
+      <span class="t-eyebrow">NOC · NETWORK OPERATIONS CENTER</span>
+      <h1>Monitor de rede</h1>
+      <p>Ferramenta interna de diagnóstico. Informe um host para testar conectividade e latência.</p>
+    </div>
+    <div class="meri-status"><i></i> sistemas operacionais <span>99,97%</span></div>
+  </section>
+
+  <div class="meri-grid">
+    <section class="t-card meri-tool">
+      <div class="t-card-head"><h2>Ping Tool <small>v0.9-beta</small></h2><span class="t-badge">build 9.0.30</span></div>
+      <p class="t-muted">A ferramenta executa <code>ping -c 2 &lt;host&gt;</code> no servidor de monitoramento.</p>
+      <form class="t-form t-form-row" action="/target/meridiano/ping" method="get">
+        <input name="host" value="{{ host or '' }}" placeholder="127.0.0.1" aria-label="Host para ping">
+        <button class="t-btn" type="submit">Pingar</button>
+      </form>
+      {% if output %}<pre class="meri-out">{{ output }}</pre>{% else %}<div class="meri-placeholder">$ aguardando um host...</div>{% endif %}
+      <details class="t-debug"><summary>nota interna de manutenção</summary><code>Runtime.getRuntime().exec("ping -c 2 " + host); // TODO: sanitizar entrada antes do deploy</code></details>
+    </section>
+
+    <aside class="meri-side" id="status">
+      <div class="t-card">
+        <div class="t-card-head"><h3>Serviços</h3><span class="t-badge">live</span></div>
+        <div class="svc-row"><span class="svc-dot ok"></span><span>nginx :80</span><strong>online</strong></div>
+        <div class="svc-row"><span class="svc-dot ok"></span><span>tomcat :8080</span><strong>online</strong></div>
+        <div class="svc-row"><span class="svc-dot ok"></span><span>mysql :3306</span><strong>online</strong></div>
+        <div class="svc-row"><span class="svc-dot warn"></span><span>ssh :22</span><strong>legado</strong></div>
+      </div>
+      <div class="t-card t-card-mini"><span class="t-mini-ico">⚠️</span><div><strong>Servidor legado</strong><small>não atualizar — produção</small></div></div>
+      <div class="t-card">
+        <div class="t-card-head"><h3>Uptime</h3></div>
+        <div class="meri-big">247<span>dias</span></div>
+        <p class="t-muted">Sem manutenção desde 2023.</p>
+      </div>
+    </aside>
+  </div>
+
+  <section class="meri-about" id="sobre">
+    <div><span class="t-eyebrow">SOBRE</span><h2>Grupo Meridiano</h2><p>Infraestrutura e logística para todo o território nacional. Este painel é de uso interno e não deve ser exposto à internet.</p></div>
+    <div class="meri-nums"><div><strong>12</strong><span>unidades</span></div><div><strong>+4k</strong><span>colaboradores</span></div><div><strong>1987</strong><span>fundação</span></div></div>
+  </section>
+</main>
+
+<footer class="t-footer"><div class="t-wrap"><span>Grupo Meridiano © 2026 — ambiente de demonstração.</span><span>NOC · interno</span></div></footer>
+{% endblock %}

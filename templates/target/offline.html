@@ -1,0 +1,21 @@
+{% extends "target/_base.html" %}
+{% block title %}{{ lab.nome }} — VM offline{% endblock %}
+{% block bodyclass %}theme-offline{% endblock %}
+
+{% block body %}
+<main class="offline-page">
+  <div class="offline-card">
+    <span class="offline-glitch">VM OFFLINE</span>
+    <div class="offline-power">⏻</div>
+    <h1>{{ lab.nome }}</h1>
+    <p>O container <code>solyd-lab-{{ lab.slug }}</code> não está em execução. Inicie a aplicação na sala do laboratório para carregar este alvo.</p>
+    <div class="offline-meta">
+      <span>host {{ lab.ip }}</span>
+      <span>status: stopped</span>
+      <span>rede isolada</span>
+    </div>
+    <a class="offline-btn" href="{{ url_for('lab_page', slug=lab.slug) }}">← Voltar e iniciar aplicação</a>
+    <small>SOLYD // LABS · ambiente local</small>
+  </div>
+</main>
+{% endblock %}

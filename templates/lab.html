@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% from "_cards.html" import lab_card with context %}
+{% from "_icons.html" import icon %}
+{% block title %}{{ lab.nome }} — Laboratório{% endblock %}
+{% block page_label %}Lab · {{ lab.nome }}{% endblock %}
+
+{% block content %}
+<nav class="crumbs">
+  <a href="{{ url_for('labs') }}">Laboratórios</a>{{ icon('chevron-right', 13) }}<span>{{ lab.nome }}</span>
+</nav>
+
+<header class="room-hero" style="--accent:{{ lab.cor }}">
+  <div class="rh-glow"></div>
+  <div class="rh-left">
+    <span class="room-icon">{{ icon(lab.icone, 30) }}</span>
+    <div class="rh-copy">
+      <div class="room-tags">
+        <span class="pill">{{ lab.categoria }}</span>
+        <span class="dif {{ lab.dificuldade|lower }}">{{ lab.dificuldade }}</span>
+        <span class="pill ghost">{{ icon('clock', 12) }} {{ lab.tempo }}</span>
+        <a class="pill ghost" href="#objetivos">{{ icon('flag', 12) }} {{ lab.tarefas|length }} flags</a>
+      </div>
+      <h1>{{ lab.nome }} <span class="room-code">// {{ lab.codename }}</span></h1>
+      <p>{{ lab.resumo }}</p>
+    </div>
+  </div>
+  <div class="rh-actions">
+    <div class="vm-state" id="vmState"><i></i><span id="vmStateText">VM parada</span></div>
+    <div class="rh-buttons">
+      <button class="btn btn-primary js-start" data-slug="{{ lab.slug }}">{{ icon('power', 15) }} Iniciar aplicação</button>
+      <button class="btn btn-stop js-stop" data-slug="{{ lab.slug }}" hidden>{{ icon('stop', 15) }} Parar aplicação</button>
+      <button class="btn btn-ghost icon-only js-reset" data-slug="{{ lab.slug }}" title="Resetar laboratório" aria-label="Resetar laboratório">{{ icon('refresh', 16) }}</button>
+    </div>
+  </div>
+</header>
+
+<div class="room-grid" id="room" data-lab="{{ lab.slug }}" data-running="{{ 'true' if running else 'false' }}"
+     data-uptime="{{ uptime }}" data-target-url="{{ lab.target_url or '' }}" data-ip="{{ lab.ip }}" data-total="{{ lab.pontos }}">
+  <div class="room-main">
+    <div class="room-tabs" role="tablist">
+      <button class="rtab active" data-tab="terminal">{{ icon('terminal', 15) }} Terminal</button>
+      <button class="rtab" data-tab="target">{{ icon('globe', 15) }} Aplicação alvo <span class="tab-live" data-tab-live hidden></span></button>
+      <button class="rtab" data-tab="briefing">{{ icon('scroll', 15) }} Briefing</button>
+      <span class="rtab-spacer"></span>
+      <span class="rtab-meta">{{ icon('lock', 12) }} rede isolada</span>
+    </div>
+
+    <section class="tab-panel active" data-panel="terminal">
+      <div class="term" id="term">
+        <div class="term-bar">
+          <span class="term-dots"><i></i><i></i><i></i></span>
+          <span class="term-title">{{ icon('terminal', 13) }} {{ lab.slug }}@solyd — bash</span>
+          <span class="term-actions">
+            <span class="term-status" id="termStatus"><i></i> offline</span>
+            <button type="button" data-term-clear title="Limpar terminal">{{ icon('refresh', 13) }}</button>
+          </span>
+        </div>
+        <div class="term-scroll" id="termScroll">
+          <div class="term-output" id="termOutput" aria-live="polite"></div>
+          <form class="term-line" id="termForm" autocomplete="off">
+            <span class="term-prompt" id="termPrompt">{% if lab.slug == 'loupe' %}www-data@loupe:/var/www/loupe${% else %}kali@solyd:~/labs/{{ lab.slug }}${% endif %}</span>
+            <input id="termInput" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="digite help para começar..." aria-label="Comando do terminal">
+            <button type="submit" aria-label="Executar comando">↵</button>
+          </form>
+        </div>
+      </div>
+      <div class="term-foot">
+        <span>{{ icon('info', 13) }} Terminal simulado. Nenhum comando toca no seu sistema.</span>
+        <span><kbd>↑</kbd><kbd>↓</kbd> histórico · <kbd>Tab</kbd> completar</span>
+      </div>
+    </section>
+
+    <section class="tab-panel" data-panel="target">
+      <div class="browser">
+        <div class="browser-bar">
+          <span class="browser-dots"><i></i><i></i><i></i></span>
+          <span class="url-bar">{{ icon('lock', 12) }} http://{{ lab.ip }}/<span class="url-path" id="urlPath"></span></span>
+          <button type="button" class="browser-btn" id="reloadFrame" title="Recarregar">{{ icon('refresh', 14) }}</button>
+          <a class="browser-btn" href="{{ lab.target_url or '#' }}" target="_blank" id="openFrame" title="Abrir em nova aba">{{ icon('external', 14) }}</a>
+        </div>
+        <div class="browser-stage" id="browserStage">
+          <div class="browser-offline" id="browserOffline">
+            <span class="bo-icon">{{ icon('power', 28) }}</span>
+            <h3>Aplicação parada</h3>
+            <p>Inicie a VM para carregar o alvo vulnerável.</p>
+            <button class="btn btn-primary btn-sm js-start" data-slug="{{ lab.slug }}">{{ icon('play', 14) }} Iniciar aplicação</button>
+          </div>
+          {% if lab.target %}
+          <iframe id="targetFrame" title="Aplicação alvo {{ lab.nome }}" data-src="{{ lab.target_url }}" hidden></iframe>
+          {% else %}
+          <div class="term-only">
+            <span class="to-icon">{{ icon('terminal', 28) }}</span>
+            <h3>Laboratório 100% terminal</h3>
+            <p>Este alvo não tem interface web. A interação acontece pelo terminal simulado.</p>
+            <button class="btn btn-ghost btn-sm" data-goto-tab="terminal">{{ icon('terminal', 14) }} Voltar ao terminal</button>
+            <div class="netmap">
+              <span class="nm-ring"></span><span class="nm-ring r2"></span><span class="nm-ring r3"></span>
+              <span class="nm-center">{{ icon('server', 20) }}<small>{{ lab.ip }}</small></span>
+              <span class="nm-node n1">22</span><span class="nm-node n2">80</span><span class="nm-node n3">443</span>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="term-foot"><span>{{ icon('alert', 13) }} Alvo intencionalmente vulnerável. Não insira dados pessoais ou reais.</span></div>
+    </section>
+
+    <section class="tab-panel" data-panel="briefing">
+      <div class="briefing">
+        <div class="brief-head">
+          <span class="kicker">BRIEFING DO CLIENTE</span>
+          <h2>{{ lab.codename }}</h2>
+          <p>{{ lab.historia }}</p>
+          <div class="brief-tags">
+            <span>{{ icon('server', 13) }} {{ lab.os }}</span>
+            <span>{{ icon('target', 13) }} {{ lab.ip }}</span>
+            <span>{{ icon('clock', 13) }} {{ lab.tempo }}</span>
+          </div>
+        </div>
+        <div class="brief-grid">
+          <div class="brief-box">
+            <h3>{{ icon('server', 15) }} Serviços expostos</h3>
+            <div class="svc-list">
+              {% for s in lab.servicos %}<span class="svc">{{ s }}</span>{% endfor %}
+            </div>
+          </div>
+          <div class="brief-box">
+            <h3>{{ icon('flag', 15) }} Objetivos</h3>
+            <ol class="obj-list">
+              {% for t in lab.tarefas %}<li data-brief-task="{{ t.id }}"><span>{{ t.titulo }}</span><em>+{{ t.pontos }} XP</em></li>{% endfor %}
+            </ol>
+          </div>
+          <div class="brief-box">
+            <h3>{{ icon('shield', 15) }} Regras de engajamento</h3>
+            <ul class="side-list">
+              <li>{{ icon('check', 13) }} Ambiente local isolado</li>
+              <li>{{ icon('check', 13) }} Ataque apenas este alvo</li>
+              <li>{{ icon('check', 13) }} As flags são a prova de comprometimento</li>
+              <li>{{ icon('check', 13) }} Use as dicas quando travar</li>
+            </ul>
+          </div>
+          <div class="brief-box accent-box" style="--accent:{{ lab.cor }}">
+            <h3>{{ icon('bolt', 15) }} Dica geral</h3>
+            <p>{{ lab.cheatsheet[0][1] if lab.cheatsheet else 'Comece enumerando. O terminal aceita help.' }}</p>
+            <button class="copy-cmd" data-copy="{{ lab.comandos[0] }}">{{ icon('copy', 13) }} {{ lab.comandos[0] }}</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <aside class="room-side" id="objetivos">
+    <div class="side-card obj-card" style="--accent:{{ lab.cor }}">
+      <div class="obj-head">
+        <div>
+          <h3>{{ icon('flag', 16) }} Objetivos</h3>
+          <p>Capture as flags para provar o comprometimento.</p>
+        </div>
+        <div class="obj-ring" id="objRing" style="--ring:{{ lab.cor }}"><span id="objRingTxt">0/{{ lab.tarefas|length }}</span></div>
+      </div>
+      <div class="obj-xp"><span id="objXp">0</span> / {{ lab.pontos }} XP <i><b id="objBar" style="width:0%"></b></i></div>
+      {% for t in lab.tarefas %}
+      <div class="task" data-task-id="{{ t.id }}" data-task-points="{{ t.pontos }}">
+        <div class="task-top">
+          <span class="task-state">{{ icon('check', 11) }}</span>
+          <strong>{{ t.titulo }}</strong>
+          <span class="task-pts">+{{ t.pontos }}</span>
+        </div>
+        <p>{{ t.desc }}</p>
+        <button class="task-hint-btn" type="button" data-hint-btn>Dica {{ icon('chevron-down', 12) }}</button>
+        <div class="task-hint" data-hint hidden>{{ t.dica }}</div>
+        <form class="flag-form" data-flag-form>
+          <input type="text" placeholder="SOLYD{...}" aria-label="Flag do objetivo" autocomplete="off" spellcheck="false">
+          <button class="btn btn-sm btn-primary" type="submit">Validar</button>
+        </form>
+        <div class="task-msg" data-task-msg></div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="side-card vm-card" style="--accent:{{ lab.cor }}">
+      <div class="vm-head">
+        <span class="vm-orb" id="vmOrb">{{ icon('power', 18) }}</span>
+        <div><h3>Máquina virtual</h3><span id="vmSub">desligada</span></div>
+        <span class="vm-pill" id="vmPill">OFF</span>
+      </div>
+      <div class="vm-rows">
+        <div class="kv"><span>Host</span><strong>{{ lab.ip }}</strong></div>
+        <div class="kv"><span>Sistema</span><strong>{{ lab.os }}</strong></div>
+        <div class="kv"><span>Uptime</span><strong id="vmUptime">—</strong></div>
+        <div class="kv"><span>Serviços</span><strong>{{ lab.servicos|length }} ativos</strong></div>
+      </div>
+      <div class="vm-power">
+        <button class="btn btn-primary full js-start" data-slug="{{ lab.slug }}">{{ icon('power', 15) }} Iniciar aplicação</button>
+        <button class="btn btn-stop full js-stop" data-slug="{{ lab.slug }}" hidden>{{ icon('stop', 15) }} Parar aplicação</button>
+      </div>
+      <button class="vm-reset js-reset" data-slug="{{ lab.slug }}">{{ icon('refresh', 13) }} Resetar snapshot</button>
+    </div>
+
+    <div class="side-card cheat-card">
+      <h3>{{ icon('command', 16) }} Cheat sheet</h3>
+      <div class="cheat-list">
+        {% for label, cmd in lab.cheatsheet %}
+        <div class="cheat">
+          <span>{{ label }}</span>
+          <button class="copy-cmd" data-copy="{{ cmd }}" title="Copiar">{{ icon('copy', 12) }} <code>{{ cmd }}</code></button>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="side-warn">
+      <span>{{ icon('alert', 15) }}</span>
+      <p>Este alvo é <strong>intencionalmente inseguro</strong> e roda somente na sua máquina. Não replique estas falhas em produção.</p>
+    </div>
+  </aside>
+</div>
+
+{% if related %}
+<section class="section related-labs">
+  <header class="section-head compact">
+    <div><span class="kicker">CONTINUE TREINANDO</span><h2>Labs relacionados</h2></div>
+    <a class="link-more" href="{{ url_for('labs') }}">Ver todos {{ icon('arrow-right', 15) }}</a>
+  </header>
+  <div class="lab-grid">
+    {% for l in related %}{{ lab_card(l) }}{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<div class="boot-overlay" id="bootOverlay" hidden>
+  <div class="boot-box">
+    <div class="boot-head"><span class="boot-dots"><i></i><i></i><i></i></span><span>solyd-lab · {{ lab.slug }}</span><span class="boot-pill">booting</span></div>
+    <pre class="boot-log" id="bootLog"></pre>
+    <div class="boot-bar"><span id="bootBar"></span></div>
+    <div class="boot-foot"><span id="bootFoot">iniciando serviços...</span><button class="btn btn-sm btn-primary" id="bootSkip">Pular animação</button></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.SOLYD_LAB_CMDS = {{ lab.comandos|tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/lab.js') }}"></script>
+{% endblock %}

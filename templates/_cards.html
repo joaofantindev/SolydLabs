@@ -1,0 +1,84 @@
+{% from "_icons.html" import icon %}
+
+{% macro trilha_card(t, compact=false) %}
+<a class="trilha-card {{ 'compact' if compact }}" href="{{ url_for('trilha_page', slug=t.slug) }}" style="--accent:{{ t.cor }}">
+  <span class="tc-glow"></span>
+  <div class="tc-head">
+    <span class="tc-icon">{{ icon(t.icone, 22) }}</span>
+    <span class="tc-tag">{{ t.tag }}</span>
+  </div>
+  <h3>{{ t.nome }}</h3>
+  <p>{{ t.descricao }}</p>
+  <div class="tc-meta">
+    <span>{{ icon('book', 14) }} {{ t.cursos|length }} cursos</span>
+    <span>{{ icon('clock', 14) }} {{ t.horas }}h</span>
+    <span>{{ icon('layers', 14) }} {{ t.nivel }}</span>
+  </div>
+  <div class="tc-foot">
+    <div class="bar"><span data-track-bar="{{ t.slug }}"></span></div>
+    <span class="tc-pct" data-track-pct="{{ t.slug }}">0%</span>
+  </div>
+  <span class="tc-arrow">{{ icon('arrow-up-right', 18) }}</span>
+</a>
+{% endmacro %}
+
+{% macro lab_card(l) %}
+<a class="lab-card" href="{{ url_for('lab_page', slug=l.slug) }}" style="--accent:{{ l.cor }}">
+  <div class="lc-top">
+    <span class="lc-cat">{{ icon(l.icone, 14) }} {{ l.categoria }}</span>
+    <span class="dif {{ l.dificuldade|lower }}">{{ l.dificuldade }}</span>
+  </div>
+  <div class="lc-main">
+    <span class="lc-icon">{{ icon(l.icone, 24) }}</span>
+    <div>
+      <h3>{{ l.nome }}</h3>
+      <p class="lc-code">{{ l.codename }}</p>
+    </div>
+  </div>
+  <p class="lc-desc">{{ l.resumo }}</p>
+  <div class="lc-foot">
+    <span>{{ icon('clock', 14) }} {{ l.tempo }}</span>
+    <span>{{ icon('flag', 14) }} {{ l.tarefas|length }} flags</span>
+    <span class="lc-points">{{ icon('bolt', 13) }} {{ l.pontos }} XP</span>
+  </div>
+  <span class="lc-open">Abrir lab {{ icon('arrow-right', 15) }}</span>
+  <i class="lab-live" data-lab-live="{{ l.slug }}" title="Status da VM"></i>
+</a>
+{% endmacro %}
+
+{% macro cert_card(c) %}
+<a class="cert-card" href="{{ url_for('certificacao_page', slug=c.slug) }}" style="--accent:{{ c.cor }}">
+  <div class="cc-top">
+    <span class="cc-sigla">{{ c.sigla }}</span>
+    <span class="cc-shield">{{ icon(c.icone, 26) }}</span>
+  </div>
+  <h3>{{ c.nome }}</h3>
+  <p>{{ c.resumo }}</p>
+  <div class="cc-skills">
+    {% for s in c.skills[:3] %}<span>{{ s }}</span>{% endfor %}
+  </div>
+  <div class="cc-foot">
+    <span>{{ icon('clock', 14) }} {{ c.duracao }}</span>
+    <span class="cc-link">Ver certificação {{ icon('arrow-up-right', 14) }}</span>
+  </div>
+</a>
+{% endmacro %}
+
+{% macro course_row(c, i=0, trilha_slug='') %}
+<div class="course-row" data-course="{{ c.slug }}">
+  <span class="cr-index">{{ '%02d' % (i + 1) }}</span>
+  <span class="cr-icon">{{ icon('play', 14) }}</span>
+  <div class="cr-body">
+    <div class="cr-title">
+      <a href="{{ url_for('curso_page', slug=c.slug) }}">{{ c.nome }}</a>
+      {% if c.gratis %}<span class="cr-free">grátis</span>{% endif %}
+      {% if c.lab %}<span class="cr-lab" title="Possui laboratório">{{ icon('flask', 12) }} lab</span>{% endif %}
+      {% if c.cert %}<span class="cr-cert">{{ CERTS[c.cert].sigla }}</span>{% endif %}
+    </div>
+    <p>{{ c.desc }}</p>
+    <div class="cr-meta"><span>{{ icon('clock', 13) }} {{ c.horas }}h</span><span>{{ icon('play', 13) }} {{ c.aulas }} aulas</span><span>{{ icon('layers', 13) }} {{ c.modulos|length }} módulos</span><span class="cr-level">{{ c.nivel }}</span></div>
+  </div>
+  <button class="course-done" data-course-done="{{ c.slug }}" type="button" title="Marcar como concluído">{{ icon('check', 16) }}</button>
+  <a class="cr-open" href="{{ url_for('curso_page', slug=c.slug) }}" aria-label="Abrir curso">{{ icon('chevron-right', 18) }}</a>
+</div>
+{% endmacro %}

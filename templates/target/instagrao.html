@@ -1,0 +1,92 @@
+{% extends "target/_base.html" %}
+{% block title %}Instagrão — compartilhe momentos{% endblock %}
+{% block bodyclass %}theme-insta{% endblock %}
+
+{% block body %}
+<header class="t-nav insta-nav">
+  <div class="t-wrap t-nav-in">
+    <a class="t-logo insta-logo" href="/target/instagrao/">Instagrão</a>
+    <div class="insta-search"><span>⌕</span><input placeholder="Buscar perfis..." aria-label="Buscar"></div>
+    <div class="t-user">
+      <span class="t-live-dot"></span>
+      <span class="t-avatar">{{ me.username[:1]|upper }}</span>
+      <span class="t-user-name">{{ me.username }} <small>logado</small></span>
+    </div>
+  </div>
+</header>
+
+<main class="t-wrap insta-wrap">
+  <aside class="insta-profile">
+    <div class="ip-avatar">{{ me.username[:1]|upper }}<i></i></div>
+    <strong>@{{ me.username }}</strong>
+    <span class="ip-name">{{ me.name }}</span>
+    <p>{{ me.bio }}</p>
+    <div class="ip-stats">
+      <div><strong>12</strong><span>posts</span></div>
+      <div><strong>{{ me.followers }}</strong><span>seguidores</span></div>
+      <div><strong>180</strong><span>seguindo</span></div>
+    </div>
+    <span class="t-badge">conta comum · id={{ me.id }}</span>
+  </aside>
+
+  <section class="insta-feed">
+    <div class="insta-post">
+      <div class="ip-head"><span class="ip-mini">M</span><strong>Marina Costa</strong><small>@admin · CEO</small></div>
+      <div class="insta-art">🏙️</div>
+      <div class="ip-actions"><span>♥</span><span>💬</span><span>↗</span></div>
+      <div class="ip-caption"><strong>@admin</strong> novo escritório, nova fase. bora construir.</div>
+    </div>
+    <div class="insta-post">
+      <div class="ip-head"><span class="ip-mini coral">C</span><strong>Coral Vieira</strong><small>@coral</small></div>
+      <div class="insta-art green">🪴</div>
+      <div class="ip-actions"><span>♥</span><span>💬</span><span>↗</span></div>
+      <div class="ip-caption"><strong>@coral</strong> a flora do escritório está oficialmente fora de controle.</div>
+    </div>
+  </section>
+
+  <aside class="insta-tools">
+    {% if error %}<div class="t-alert">{{ error }}</div>{% endif %}
+
+    <div class="t-card">
+      <div class="t-card-head"><h3>API Explorer</h3><span class="t-badge">v2</span></div>
+      <p class="t-muted">Sua sessão: <b>@bruno (id=2)</b>. A API recebe o ID na URL.</p>
+      <div class="api-buttons">
+        <button class="t-btn t-btn-sm" data-api="/target/instagrao/api/user/2">GET /api/user/2</button>
+        <button class="t-btn t-btn-sm" data-api="/target/instagrao/api/user/1">GET /api/user/1</button>
+      </div>
+      <pre class="api-out" id="apiOut">// clique em uma chamada para ver a resposta</pre>
+    </div>
+
+    <div class="t-card">
+      <div class="t-card-head"><h3>Importar foto</h3><span class="t-badge">worker</span></div>
+      <form class="t-form" action="/target/instagrao/import" method="get">
+        <label>URL da imagem<input name="url" value="{{ url or '' }}" placeholder="https://exemplo.com/foto.jpg"></label>
+        <button class="t-btn t-btn-block" type="submit">Importar</button>
+      </form>
+      {% if result %}<div class="t-alert ok">{{ result }}</div>{% endif %}
+      {% if metadata %}
+      <div class="t-alert danger">
+        <strong>Resposta interna capturada:</strong>
+        <pre class="api-out">{{ metadata|tojson(indent=2) }}</pre>
+      </div>
+      {% endif %}
+      <p class="t-hint">O worker busca a URL a partir do servidor, não do navegador.</p>
+    </div>
+
+    <div class="t-card t-card-mini"><span class="t-mini-ico">☁️</span><div><strong>Cloud sync</strong><small>metadata 169.254.169.254</small></div></div>
+  </aside>
+</main>
+
+<footer class="t-footer"><div class="t-wrap"><span>Instagrão © 2026 — rede social de demonstração.</span><span>api v2.4.1</span></div></footer>
+<script>
+  document.querySelectorAll('[data-api]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var out = document.getElementById('apiOut');
+      out.textContent = '// GET ' + b.dataset.api + '\n// carregando...';
+      fetch(b.dataset.api).then(function (r) { return r.json(); }).then(function (j) {
+        out.textContent = JSON.stringify(j, null, 2);
+      }).catch(function (e) { out.textContent = '// erro: ' + e; });
+    });
+  });
+</script>
+{% endblock %}

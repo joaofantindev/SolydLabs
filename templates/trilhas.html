@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% from "_cards.html" import trilha_card with context %}
+{% from "_icons.html" import icon %}
+{% block title %}Trilhas — SOLYD // LABS{% endblock %}
+{% block page_label %}Trilhas de formação{% endblock %}
+
+{% block content %}
+<header class="page-hero">
+  <div class="ph-glow" style="--accent:#ff3557"></div>
+  <span class="kicker">FORMAÇÕES SOLYD // LABS</span>
+  <h1>Escolha sua <span class="grad">trilha</span>.<br>Ou domine todas.</h1>
+  <p>{{ TRILHAS|length }} trilhas, {{ CURSOS|length }} cursos e {{ total_labs }} laboratórios. Cada formação combina teoria objetiva, laboratório prático e uma certificação no final do caminho.</p>
+  <div class="ph-stats">
+    <span>{{ icon('route', 15) }} {{ TRILHAS|length }} trilhas</span>
+    <span>{{ icon('book', 15) }} {{ CURSOS|length }} cursos</span>
+    <span>{{ icon('flask', 15) }} {{ total_labs }} labs</span>
+    <span>{{ icon('award', 15) }} {{ total_certs }} certificações</span>
+  </div>
+</header>
+
+<div class="filter-bar" data-filter-bar>
+  <div class="filter-chips">
+    <button class="chip active" data-level="all">Todas</button>
+    <button class="chip" data-level="iniciante">Iniciante</button>
+    <button class="chip" data-level="intermediário">Intermediário</button>
+    <button class="chip" data-level="avançado">Avançado</button>
+  </div>
+  <div class="filter-search">
+    {{ icon('search', 15) }}
+    <input id="trilhaSearch" placeholder="Filtrar trilhas..." aria-label="Filtrar trilhas">
+  </div>
+</div>
+
+<div class="trilha-grid all" id="trilhaGrid">
+  {% for t in TRILHAS %}
+  <div class="filter-item" data-level="{{ t.nivel|lower }}" data-name="{{ t.nome|lower }} {{ t.descricao|lower }}">
+    {{ trilha_card(t) }}
+  </div>
+  {% endfor %}
+</div>
+<div class="empty-state" id="trilhaEmpty" hidden>{{ icon('search', 26) }}<p>Nenhuma trilha encontrada com esse filtro.</p></div>
+
+<section class="journey-strip">
+  <div class="js-copy">
+    <span class="kicker">COMO FUNCIONA</span>
+    <h3>Aprenda → pratique → prove</h3>
+    <p>Estude os módulos, abra o laboratório correspondente, capture as flags e feche a trilha com a certificação prática.</p>
+  </div>
+  <div class="js-steps">
+    <div class="js-step"><span>01</span><strong>Trilha</strong><small>Fundamento guiado</small></div>
+    <div class="js-step"><span>02</span><strong>Labs</strong><small>Alvos reais de treino</small></div>
+    <div class="js-step"><span>03</span><strong>Flags</strong><small>XP e ranking</small></div>
+    <div class="js-step"><span>04</span><strong>Certificação</strong><small>Exame prático</small></div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.SOLYD_TRILHAS_FILTER = true;
+</script>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}{{ curso.nome }} — Curso{% endblock %}
+{% block page_label %}Curso · {{ curso.nome }}{% endblock %}
+
+{% block content %}
+<nav class="crumbs">
+  <a href="{{ url_for('trilhas') }}">Trilhas</a>{{ icon('chevron-right', 13) }}
+  {% if trilha %}<a href="{{ url_for('trilha_page', slug=trilha.slug) }}">{{ trilha.nome }}</a>{{ icon('chevron-right', 13) }}{% endif %}
+  <span>{{ curso.nome }}</span>
+</nav>
+
+<header class="course-hero" {% if trilha %}style="--accent:{{ trilha.cor }}"{% endif %}>
+  <div class="ch-glow"></div>
+  <div class="ch-copy">
+    <div class="th-tags">
+      <span class="pill">{{ curso.nivel }}</span>
+      <span class="pill ghost">{{ icon('clock', 12) }} {{ curso.horas }}h</span>
+      <span class="pill ghost">{{ icon('play', 12) }} {{ curso.aulas }} aulas</span>
+      {% if curso.cert %}<a class="pill cert" href="{{ url_for('certificacao_page', slug=curso.cert) }}">{{ icon('award', 12) }} {{ CERTS[curso.cert].sigla }}</a>{% endif %}
+    </div>
+    <h1>{{ curso.nome }}</h1>
+    <p>{{ curso.desc }}</p>
+    <div class="th-actions">
+      <a class="btn btn-primary" href="#ementa">{{ icon('play', 15) }} Começar curso</a>
+      {% if labs %}<a class="btn btn-ghost" href="{{ url_for('lab_page', slug=labs[0].slug) }}">{{ icon('flask', 15) }} Abrir laboratório</a>{% endif %}
+      <button class="btn btn-ghost course-done" data-course-done="{{ curso.slug }}" type="button">{{ icon('check', 15) }} <span data-done-label>Marcar concluído</span></button>
+    </div>
+  </div>
+  <div class="ch-learn">
+    <span class="kicker">VOCÊ VAI APRENDER</span>
+    <ul>
+      {% for m in curso.modulos[:4] %}
+      <li>{{ icon('check', 14) }} <span>{{ m[0] }}</span></li>
+      {% endfor %}
+      <li class="more">+ {{ curso.modulos|length - 4 }} módulos</li>
+    </ul>
+  </div>
+</header>
+
+<div class="course-layout">
+  <section class="course-main" id="ementa" data-course="{{ curso.slug }}">
+    <header class="section-head compact">
+      <div><span class="kicker">EMENTA</span><h2>Conteúdo do curso</h2></div>
+      <span class="tiny-note">{{ curso.modulos|length }} módulos · {{ curso.aulas }} aulas</span>
+    </header>
+    <div class="modules">
+      {% for modulo in curso.modulos %}
+      <details class="module" {% if loop.first %}open{% endif %}>
+        <summary>
+          <span class="mod-num">{{ '%02d' % loop.index }}</span>
+          <span class="mod-title">{{ modulo[0] }}</span>
+          <span class="mod-meta">{{ modulo[1]|length }} tópicos</span>
+          <span class="mod-chev">{{ icon('chevron-down', 16) }}</span>
+        </summary>
+        <div class="mod-body">
+          <ul>
+            {% for topico in modulo[1] %}
+            <li><span class="topic-play">{{ icon('play', 11) }}</span><span>{{ topico }}</span><em>aula</em></li>
+            {% endfor %}
+          </ul>
+          <button class="mod-done" type="button">{{ icon('check', 13) }} marcar módulo</button>
+        </div>
+      </details>
+      {% endfor %}
+    </div>
+
+    <div class="course-finish">
+      <span class="cf-icon">{{ icon('award', 24) }}</span>
+      <div><strong>Terminou o conteúdo?</strong><p>Marque o curso como concluído para atualizar sua trilha, seu XP e seu progresso.</p></div>
+      <button class="btn btn-primary course-done" data-course-done="{{ curso.slug }}" type="button">{{ icon('check', 15) }} <span data-done-label>Concluir curso</span></button>
+    </div>
+  </section>
+
+  <aside class="course-side">
+    <div class="side-card pad progress-card">
+      <h3>{{ icon('zap', 16) }} Seu progresso</h3>
+      <div class="pc-ring" data-course-ring="{{ curso.slug }}" style="--ring:{{ trilha.cor if trilha else '#ff3557' }}"><span data-course-pct="{{ curso.slug }}">0%</span></div>
+      <p>Marque o curso como concluído para desbloquear o selo na trilha.</p>
+    </div>
+
+    <div class="side-card pad">
+      <h3>{{ icon('info', 16) }} Detalhes</h3>
+      <div class="kv"><span>Nível</span><strong>{{ curso.nivel }}</strong></div>
+      <div class="kv"><span>Carga horária</span><strong>{{ curso.horas }}h</strong></div>
+      <div class="kv"><span>Aulas</span><strong>{{ curso.aulas }}</strong></div>
+      <div class="kv"><span>Módulos</span><strong>{{ curso.modulos|length }}</strong></div>
+      {% if trilha %}<div class="kv"><span>Trilha</span><a href="{{ url_for('trilha_page', slug=trilha.slug) }}">{{ trilha.nome }}</a></div>{% endif %}
+      {% if cert %}<div class="kv"><span>Certificação</span><a href="{{ url_for('certificacao_page', slug=cert.slug) }}">{{ cert.sigla }}</a></div>{% endif %}
+    </div>
+
+    {% if labs %}
+    {% set l = labs[0] %}
+    <div class="side-lab-card" style="--accent:{{ l.cor }}">
+      <span class="slc-kicker">{{ icon('flask', 13) }} LAB RECOMENDADO</span>
+      <h3>{{ l.nome }}</h3>
+      <p>{{ l.resumo }}</p>
+      <div class="slc-meta"><span class="dif {{ l.dificuldade|lower }}">{{ l.dificuldade }}</span><span>{{ icon('bolt', 12) }} {{ l.pontos }} XP</span></div>
+      <a class="btn btn-primary btn-sm full" href="{{ url_for('lab_page', slug=l.slug) }}">{{ icon('power', 14) }} Abrir laboratório</a>
+    </div>
+    {% endif %}
+
+    {% if trilha %}
+    <a class="side-back" href="{{ url_for('trilha_page', slug=trilha.slug) }}">{{ icon('route', 15) }} Voltar para a trilha <span>{{ trilha.nome }}</span></a>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

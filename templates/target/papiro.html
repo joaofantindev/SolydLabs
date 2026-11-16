@@ -1,0 +1,70 @@
+{% extends "target/_base.html" %}
+{% block title %}Livraria Papiro — acervo digital{% endblock %}
+{% block bodyclass %}theme-papiro{% endblock %}
+
+{% block body %}
+<header class="t-nav">
+  <div class="t-wrap t-nav-in">
+    <a class="t-logo" href="/target/papiro/"><span class="t-logo-mark">❦</span> Papiro</a>
+    <nav class="t-menu"><a href="/target/papiro/">Acervo</a><a href="/target/papiro/#leitor">Leitor</a><a href="/target/papiro/#upload">Autores</a></nav>
+    <div class="t-user"><span class="t-user-name">visitante <small>acesso público</small></span></div>
+  </div>
+</header>
+
+<main class="t-wrap papiro-wrap">
+  <section class="papiro-hero">
+    <div>
+      <span class="t-eyebrow">ACERVO DIGITAL · DESDE 1998</span>
+      <h1>Livros que <em>duram</em>.</h1>
+      <p>Clássicos digitalizados e obras independentes. Leia online, baixe o PDF ou envie seu original para publicação.</p>
+    </div>
+    <div class="papiro-seal">❦<span>acervo<br>aberto</span></div>
+  </section>
+
+  {% if upload_msg %}<div class="t-banner t-banner-ok">{{ upload_msg }}</div>{% endif %}
+
+  <div class="t-section-head"><h2>Acervo disponível</h2><span>{{ books|length }} títulos</span></div>
+  <div class="book-grid">
+    {% for b in books %}
+    <article class="book-card">
+      <div class="book-cover"><span>{{ ['I','II','III','IV'][loop.index0 % 4] }}</span></div>
+      <strong>{{ b.replace('.txt','').replace('-',' ')|title }}</strong>
+      <small>PDF · domínio público</small>
+      <a class="t-btn t-btn-sm" href="/target/papiro/read?file={{ b|urlencode }}">Ler online</a>
+    </article>
+    {% endfor %}
+  </div>
+
+  <section class="t-card reader" id="leitor">
+    <div class="t-card-head">
+      <h2>Leitor online</h2>
+      <span class="t-badge">server-side</span>
+    </div>
+    {% if filename %}<p class="t-muted">Arquivo solicitado: <code>{{ filename }}</code></p>{% endif %}
+    {% if error %}<div class="t-alert">{{ error }}</div>{% endif %}
+    {% if content %}
+    <pre class="reader-content">{{ content }}</pre>
+    {% elif not error %}
+    <p class="t-muted">Escolha um título acima ou ajuste o parâmetro <code>?file=</code>.</p>
+    {% endif %}
+    <details class="t-debug">
+      <summary>nota do desenvolvedor</summary>
+      <code>O leitor remove "../" da entrada antes de abrir o arquivo. Deve ser suficiente, certo?</code>
+    </details>
+  </section>
+
+  <section class="t-card upload-card" id="upload">
+    <div class="t-card-head"><h3>Área do autor · enviar original</h3><span class="t-badge">upload</span></div>
+    <form class="t-form" action="/target/papiro/upload" method="post" enctype="multipart/form-data">
+      <label>Arquivo (PDF, TXT, ZIP, capa...)<input type="file" name="file" required></label>
+      <button class="t-btn" type="submit">Enviar para análise</button>
+    </form>
+    {% if uploaded %}
+    <p class="t-muted">Último upload: <a href="/target/papiro/uploads/{{ uploaded }}">{{ uploaded }}</a></p>
+    {% endif %}
+    <p class="t-hint">Aceita qualquer extensão para facilitar a vida dos autores. 😉</p>
+  </section>
+</main>
+
+<footer class="t-footer"><div class="t-wrap"><span>Livraria Papiro © 2026 — demonstração.</span><span>feito com carinho e validação duvidosa</span></div></footer>
+{% endblock %}

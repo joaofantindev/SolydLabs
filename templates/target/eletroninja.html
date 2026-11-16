@@ -1,0 +1,125 @@
+{% extends "target/_base.html" %}
+{% block title %}EletroNinja — Componentes para makers{% endblock %}
+{% block bodyclass %}theme-ninja{% endblock %}
+
+{% block body %}
+<header class="t-nav">
+  <div class="t-wrap t-nav-in">
+    <a class="t-logo" href="/target/eletroninja/"><span class="t-logo-mark">⚡</span> Eletro<span>Ninja</span></a>
+    <nav class="t-menu">
+      <a href="/target/eletroninja/">Início</a>
+      <a href="/target/eletroninja/#produtos">Produtos</a>
+      <a href="/target/eletroninja/#busca">Busca</a>
+    </nav>
+    <div class="t-user">
+      {% if user %}
+        <span class="t-avatar">{{ user.username[:1]|upper }}</span>
+        <span class="t-user-name">{{ user.username }} <small>{{ user.role }}</small></span>
+        <a class="t-link" href="/target/eletroninja/logout">sair</a>
+      {% else %}
+        <a class="t-btn t-btn-sm" href="#login">Entrar</a>
+      {% endif %}
+    </div>
+  </div>
+</header>
+
+{% if user and user.role == 'admin' %}
+<div class="t-banner t-banner-ok">
+  <div class="t-wrap">
+    <strong>Painel administrativo</strong> — sessão iniciada como <b>{{ user.username }}</b>.
+    <span class="t-flag">FLAG: SOLYD{sqli_bypass_4dm1n}</span>
+  </div>
+</div>
+{% endif %}
+
+<main>
+  <section class="ninja-hero">
+    <div class="t-wrap ninja-hero-in">
+      <div>
+        <span class="t-eyebrow">COMPONENTES PARA MAKERS</span>
+        <h1>Monte. Queime.<br><em>Conserte.</em></h1>
+        <p>Arduino, Raspberry Pi, sensores e tudo que você precisa para o próximo projeto — com entrega para todo o Brasil.</p>
+        <form class="t-search" action="/target/eletroninja/search" method="get">
+          <input name="q" value="{{ search or '' }}" placeholder="Buscar componente... ex: sensor" aria-label="Buscar produtos">
+          <button class="t-btn" type="submit">Buscar</button>
+        </form>
+      </div>
+      <div class="ninja-promo">
+        <span class="promo-tag">OFERTA DA SEMANA</span>
+        <div class="promo-art">🔌</div>
+        <strong>Kit Maker Starter</strong>
+        <span>de R$ 249 por <b>R$ 189</b></span>
+      </div>
+    </div>
+  </section>
+
+  <div class="t-wrap ninja-main">
+    <section class="ninja-products" id="produtos">
+      <div class="t-section-head">
+        <h2>Mais vendidos</h2>
+        <span>{{ products|length }} produtos</span>
+      </div>
+      <div class="prod-grid">
+        {% for p in products %}
+        <article class="prod-card">
+          <div class="prod-art">{{ ['🔌','🌡️','💡','🧲','🔋','🛠️'][loop.index0 % 6] }}</div>
+          <strong>{{ p.name }}</strong>
+          <small>{{ p.description }}</small>
+          <div class="prod-foot"><span>R$ {{ '%.2f'|format(p.price) }}</span><button class="t-btn t-btn-xs">Comprar</button></div>
+        </article>
+        {% endfor %}
+      </div>
+    </section>
+
+    <aside class="ninja-side">
+      {% if error %}
+      <div class="t-alert">{{ error }}</div>
+      {% endif %}
+
+      {% if rows is not none %}
+      <div class="t-card" id="busca">
+        <div class="t-card-head"><h3>Resultados da busca</h3><span class="t-badge">SQL</span></div>
+        {% if search %}<p class="t-muted">Termo pesquisado: <code>{{ search }}</code></p>{% endif %}
+        {% if query %}<details class="t-debug"><summary>ver query executada</summary><code>{{ query }}</code></details>{% endif %}
+        {% if rows %}
+        <table class="t-table">
+          <thead><tr><th>ID</th><th>Nome</th><th>Preço</th></tr></thead>
+          <tbody>
+            {% for r in rows %}<tr><td>{{ r[0] }}</td><td>{{ r[1] }}</td><td>{{ r[2] }}</td></tr>{% endfor %}
+          </tbody>
+        </table>
+        {% else %}<p class="t-muted">Nenhum resultado.</p>{% endif %}
+      </div>
+      {% endif %}
+
+      <div class="t-card" id="login">
+        <div class="t-card-head"><h3>Área do cliente</h3><span class="t-badge">login</span></div>
+        {% if user %}
+          <p class="t-muted">Você está autenticado como <b>{{ user.username }}</b>.</p>
+          <a class="t-btn t-btn-block" href="/target/eletroninja/logout">Encerrar sessão</a>
+        {% else %}
+        <form class="t-form" action="/target/eletroninja/login" method="post">
+          <label>Usuário<input name="username" autocomplete="off" placeholder="admin"></label>
+          <label>Senha<input name="password" type="password" autocomplete="off" placeholder="••••••••"></label>
+          <button class="t-btn t-btn-block" type="submit">Entrar</button>
+        </form>
+        <p class="t-hint">Demonstração: o formulário não usa prepared statements.</p>
+        {% endif %}
+        {% if query and rows is none %}<details class="t-debug"><summary>ver query executada</summary><code>{{ query }}</code></details>{% endif %}
+      </div>
+
+      <div class="t-card t-card-mini">
+        <span class="t-mini-ico">🚚</span>
+        <div><strong>Frete grátis</strong><small>acima de R$ 199</small></div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<footer class="t-footer">
+  <div class="t-wrap">
+    <span>EletroNinja © 2026 — loja de demonstração para treinamento.</span>
+    <span>suporte@eletroninja.lab</span>
+  </div>
+</footer>
+{% endblock %}

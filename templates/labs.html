@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% from "_cards.html" import lab_card with context %}
+{% from "_icons.html" import icon %}
+{% block title %}Laboratórios — SOLYD // LABS{% endblock %}
+{% block page_label %}Laboratórios{% endblock %}
+
+{% block content %}
+<header class="page-hero labs-hero">
+  <div class="ph-glow" style="--accent:#ffb020"></div>
+  <span class="kicker">OFFENSIVE PLAYGROUND</span>
+  <h1>Alvos vulneráveis.<br><span class="grad">Conhecimento real.</span></h1>
+  <p>{{ LABS|length }} laboratórios interativos com SQL Injection, XSS, LFI, upload, IDOR, SSRF, command injection, privEsc e prompt injection. Inicie a aplicação e ataque do seu navegador.</p>
+  <div class="ph-stats">
+    <span>{{ icon('flask', 15) }} {{ LABS|length }} labs</span>
+    <span>{{ icon('flag', 15) }} {{ total_flags }} flags</span>
+    <span>{{ icon('bolt', 15) }} {{ total_points }} XP disponíveis</span>
+    <span class="live"><i></i> <span id="onlineCount">0</span> VMs online</span>
+  </div>
+</header>
+
+<div class="filter-bar labs-filter">
+  <div class="filter-chips" data-cat-chips>
+    <button class="chip active" data-cat="all">Todos</button>
+    <button class="chip" data-cat="web">Web</button>
+    <button class="chip" data-cat="infra">Infra</button>
+    <button class="chip" data-cat="recon">Recon</button>
+    <button class="chip" data-cat="ia">IA / LLM</button>
+  </div>
+  <div class="filter-right">
+    <select class="select" id="difFilter" aria-label="Filtrar dificuldade">
+      <option value="all">Todas as dificuldades</option>
+      <option value="fácil">Fácil</option>
+      <option value="médio">Médio</option>
+      <option value="difícil">Difícil</option>
+    </select>
+    <div class="filter-search">
+      {{ icon('search', 15) }}
+      <input id="labSearch" placeholder="Buscar lab..." aria-label="Buscar laboratório">
+    </div>
+  </div>
+</div>
+
+<div class="lab-grid" id="labGrid">
+  {% for slug in LAB_ORDER %}
+  {% set l = LABS[slug] %}
+  <div class="filter-item" data-cat="{{ 'web' if 'Web' in l.categoria else ('ia' if 'IA' in l.categoria else ('recon' if l.categoria == 'Recon' else 'infra')) }}" data-dif="{{ l.dificuldade|lower }}" data-name="{{ l.nome|lower }} {{ l.codename|lower }} {{ l.categoria|lower }} {{ (l.tarefas|map(attribute='titulo')|join(' '))|lower }}">
+    {{ lab_card(l) }}
+  </div>
+  {% endfor %}
+</div>
+<div class="empty-state" id="labEmpty" hidden>{{ icon('search', 26) }}<p>Nenhum laboratório com esse filtro. Tente outra categoria.</p></div>
+
+<section class="safety-note">
+  <span class="sn-icon">{{ icon('shield', 22) }}</span>
+  <div>
+    <strong>Ambiente 100% local e intencionalmente vulnerável</strong>
+    <p>Os alvos existem apenas em <code>127.0.0.1</code>. SQL Injection roda contra um banco descartável; LFI, command injection e SSRF são simulados em Python. Nunca exponha esta aplicação à internet e nunca use estas técnicas sem autorização por escrito.</p>
+  </div>
+  <span class="sn-tag">{{ icon('lock', 13) }} sandbox</span>
+</section>
+
+<section class="lab-roadmap">
+  <span class="kicker">TRILHA DE PRÁTICA</span>
+  <h2>Do primeiro clique ao <span class="grad">root</span></h2>
+  <div class="roadmap">
+    <div class="rm-step"><span>01</span><strong>Recon</strong><small>Pingo Verde</small></div>
+    <div class="rm-line"></div>
+    <div class="rm-step"><span>02</span><strong>Web</strong><small>EletroNinja / ShoutBox</small></div>
+    <div class="rm-line"></div>
+    <div class="rm-step"><span>03</span><strong>Exploração</strong><small>Papiro / Instagrão</small></div>
+    <div class="rm-line"></div>
+    <div class="rm-step"><span>04</span><strong>Infra</strong><small>Meridiano / Loupe</small></div>
+    <div class="rm-line"></div>
+    <div class="rm-step"><span>05</span><strong>IA</strong><small>Echo LLM</small></div>
+  </div>
+</section>
+{% endblock %}
